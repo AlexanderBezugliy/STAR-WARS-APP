@@ -1,0 +1,48 @@
+.button-navigate {
+    width: 120px;
+    padding: 10px 20px;
+    font-size: var(--font-size-sub-header);
+    margin: 5px;
+    border: 2px solid var(--color-violet);
+    border-radius: 4px;
+    background: #fff;
+    color: rgb(24, 22, 22);
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.button-navigate:disabled {
+    color: #6e6c6c;
+}
+
+.button-navigate:hover {
+    background-color: var(--color-white);
+    color: var(--color-black);
+}
+
+.button-navigate:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.dark {
+    border: 1px solid var(--color-white);
+    color: var(--color-white);
+}
+
+.dark:hover {
+    color: black;
+    background-color: var(--color-white);
+}
+
+.light {
+    border: 1px solid var(--color-black);
+    color: rgb(24, 22, 22);
+}
+
+.light:hover { 
+    color: var(--color-white);
+    background-color: var(--color-black);
+}
