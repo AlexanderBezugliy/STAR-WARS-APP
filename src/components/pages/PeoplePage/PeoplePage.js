@@ -1,52 +1,20 @@
-import { useEffect, useReducer } from 'react';
+import { useEffect, useState } from 'react';
 import { getPeopleId, getPeopleImg, SWApiServices } from '../../../utils/SWApi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+
 import PeopleList from '../../PeopleList/PeopleList';
 import ErrorMessage from '../../../errorMessage/ErrorMessage';
 import Buttons from '../../Buttons/Buttons';
+
 import './style.css';
 
-//начальное состояние
-const initialState = {
-    people: [],
-    errorApi: false,
-    prevPage: null,
-    nextPage: null,
-    loading: false,
-};
-
-
-const reducer = (state, action) => {
-    switch (action.type) {
-        case 'FETCH_START':
-            return {
-                ...state,
-                loading: true,
-                errorApi: false,
-            }
-        case 'FETCH_SUCCESS':
-            return {
-                ...state,
-                people: action.payload.people,
-                prevPage: action.payload.prevPage,
-                nextPage: action.payload.nextPage,
-                loading: false,
-            }
-        case 'FETCH_ERROR':
-            return {
-                ...state,
-                loading: false,
-                errorApi: true,
-            }
-    
-        default:
-            return state;
-    }
-};
 
 const PeoplePage = () => {
-    const [state, dispatch] = useReducer(reducer, initialState);
-    const { people, errorApi, prevPage, nextPage, loading } = state;
+    const [people, setPeople] = useState([]);
+    const [prevPage, setPrevPage] = useState(null);
+    const [nextPage, setNextPage] = useState(null);
+    const [errorApi, setErrorApi] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const [searchParams, setSearchParams] = useSearchParams();
 
@@ -58,7 +26,7 @@ const PeoplePage = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            dispatch({ type: 'FETCH_START' });
+            setLoading(true);
 
             try {
                 const data = await getResource(page);
@@ -71,21 +39,19 @@ const PeoplePage = () => {
                     }
                 })
 
-                dispatch({ 
-                    type: 'FETCH_SUCCESS',
-                    payload: {
-                        people: peopleList,
-                        prevPage: data.previous,
-                        nextPage: data.next, 
-                    }
-                })
+                setLoading(false);
+                setPeople(peopleList);
+                setPrevPage(data.previous);
+                setNextPage(data.next);
+                setErrorApi(false);
             } catch (error) {
-                dispatch({ type: 'FETCH_ERROR' })
+                setLoading(false);
+                setErrorApi(true);
             } 
         };
 
         fetchData();//ОБЯЗАТЕЛЬНО ВНУТРИ ВЫЗАТЬ ФУНКЦИЮ!
-    }, [searchParams]); //ЗАВИСИМ ОТ searchParams
+    }, [page]); //ЗАВИСИМ ОТ searchParams
 
     const handlePageChange = (newPage) => {
         setSearchParams({
@@ -108,7 +74,7 @@ const PeoplePage = () => {
 
     return (
         <>
-            {errorApi ? <ErrorMessage /> : <View {...{...viewProps}} />}
+            {errorApi ? <ErrorMessage /> : <View {...viewProps} />}
         </>
     );
 }
@@ -128,7 +94,7 @@ const View = ({ people, handlePageChange, prevPage, nextPage, page, loading }) =
             <h1 className='header__text'>People Page</h1>
 
             <div className='wrapper__button-navigate'>
-                <Buttons {...{...buttonProps}} />
+                <Buttons {...buttonProps} />
             </div>
 
             <PeopleList people={people} loading={loading} />
